@@ -1271,7 +1271,7 @@ namespace MediaTekDocuments.view
             }
         }
 
-        
+
         /// <summary>
         /// Affichage des informations du livre sélectionné
         /// </summary>
@@ -1341,7 +1341,7 @@ namespace MediaTekDocuments.view
         private void TabLivresCom_Enter(object sender, EventArgs e)
         {
             RemplirLivresListeCom(null);
-        }        
+        }
 
         /// <summary>
         /// Sur la sélection d'une ligne ou cellule dans le grid
@@ -1463,7 +1463,7 @@ namespace MediaTekDocuments.view
                         controller.CreerCommandeDocument(id, nbExemplaire, idLivreDvd, idSuivi);
                         lesCommandesLivres = controller.GetAllCommandes(txbLivresComNumRecherche.Text);
                         RemplirLivresListeCom(lesCommandesLivres);
-                        MessageBox.Show("La commande " + id + " a bien été enregistrée pour le livre : " + txbLivresComTitre.Text , "Information");
+                        MessageBox.Show("La commande " + id + " a bien été enregistrée pour le livre : " + txbLivresComTitre.Text, "Information");
                         dgvLivresComListe.Refresh();
                     }
                     else
@@ -1487,8 +1487,8 @@ namespace MediaTekDocuments.view
         private void btnAnnulerCommande_Click(object sender, EventArgs e)
         {
             ViderInfosCommandes();
-            btnAnnulerCommande.Visible= false;
-            btnValiderCommande.Visible= false;
+            btnAnnulerCommande.Visible = false;
+            btnValiderCommande.Visible = false;
         }
 
         /*                  SUIVI COMMANDE              */
@@ -1590,8 +1590,355 @@ namespace MediaTekDocuments.view
             {
                 MessageBox.Show("Veuillez saisir une nouvelle étape de suivi", "Erreur");
             }
+
+        }
+        #endregion Onglet Commande de Livres
+
+
+        #region Onglet Commande de DVD
+
+        private readonly BindingSource bdgDvdsComListe = new BindingSource();
+
+        private List<CommandeDocument> lesCommandesDvds = new List<CommandeDocument>();
+
+        /// <summary>
+        /// Ouverture de l'onglet Commande de DVDs : 
+        /// appel des méthodes pour remplir le datagrid des DVDs et des combos (genre, rayon, public)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BtnDvdsComNumRecherche_Click(Object sender, EventArgs e)
+        {
+            if (!txbDvdsComNumRecherche.Text.Equals(""))
+            {
+                Dvd dvd = lesDvd.Find(x => x.Id.Equals(txbDvdsComNumRecherche.Text));
+                lesCommandesDvds = controller.GetAllCommandes(txbDvdsComNumRecherche.Text);
+                if (dvd != null)
+                {
+                    AfficherInfosDvdsCommande(dvd);
+                    RemplirDvdsListeCom(lesCommandesDvds);
+                    MessageBox.Show("Nombre de commandes chargées : " + lesCommandesDvds.Count);
+                }
+                else
+                {
+                    MessageBox.Show("Le numéro est introuvable");
+                }
+            }
         }
 
+        /// <summary>
+        /// Affichage des informations du DVD sélectionné
+        /// </summary>
+        /// <param name="dvd">le dvd</param>
+        private void AfficherInfosDvdsCommande(Dvd dvd)
+        {
+            txbDvdsComRealisateur.Text = dvd.Realisateur;
+            txbDvdsComTitre.Text = dvd.Titre;
+            txbDvdsComNumero.Text = dvd.Id;
+            txbDvdsComDuree.Text = dvd.Duree.ToString();
+            txbDvdsComGenre.Text = dvd.Genre;
+            txbDvdsComPublic.Text = dvd.Public;
+            txbDvdsComRayon.Text = dvd.Rayon;
+        }
+
+        private void ViderInfosDvdsCom()
+        {
+            txbDvdsComRealisateur.Text = "";
+            txbDvdsComTitre.Text = "";
+            txbDvdsComNumero.Text = "";
+            txbDvdsComDuree.Text = "";
+            txbDvdsComGenre.Text = "";
+            txbDvdsComPublic.Text = "";
+            txbDvdsComRayon.Text = "";
+        }
+
+        /// <summary>
+        /// Ouverture de l'onglet Commande de DVDs : 
+        /// appel des méthodes pour remplir le datagrid des DVDs et des combos (genre, rayon, public)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void RemplirDvdsListeCom(List<CommandeDocument> lesCommandesDocument)
+        {
+            if (lesCommandesDocument != null)
+            {
+                bdgDvdsComListe.DataSource = lesCommandesDocument;
+                dgvDvdsComListe.DataSource = bdgDvdsComListe;
+                dgvDvdsComListe.Columns["id"].Visible = false;
+                dgvDvdsComListe.Columns["idLivreDvd"].Visible = false;
+                dgvDvdsComListe.Columns["idSuivi"].Visible = false;
+                dgvDvdsComListe.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+                bdgDvdsComListe.ResetBindings(false);
+                dgvDvdsComListe.Refresh();
+            }
+            else
+            {
+                bdgDvdsComListe.DataSource = null;
+                bdgDvdsComListe.ResetBindings(false);
+                dgvDvdsComListe.Refresh();
+            }
+        }
+
+        /// <summary>
+        /// Sur la sélection d'une ligne ou cellule dans le grid
+        /// affichage des informations du DVD
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DgvDvdsComListeCom_SelectionChanged(object sender, EventArgs e)
+        {
+            if (dgvDvdsComListe.CurrentCell != null)
+            {
+                CommandeDocument commandeDocument = (CommandeDocument)bdgDvdsComListe.List[bdgDvdsComListe.Position];
+                AfficherCommandeDvdsInfos(commandeDocument);
+                ViderInfosSuiviDvds();
+            }
+        }
+
+        private void AfficherCommandeDvdsInfos(CommandeDocument commande)
+        {
+            txbNumCommandeDvds.Text = commande.id;
+            txbNbExemplaireDvds.Text = commande.nbExemplaire.ToString();
+            txbMontantDvds.Text = commande.montant.ToString();
+            dtpDateCommandeDvds.Value = commande.dateCommande;
+        }
+
+        /// <summary>
+        /// Tri sur les colonnes
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DgvDvdsComListeCom_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            string titreColonne = dgvDvdsComListe.Columns[e.ColumnIndex].HeaderText;
+            List<CommandeDocument> sortedList = new List<CommandeDocument>();
+            switch (titreColonne)
+            {
+                case "dateCommande":
+                    sortedList = lesCommandesDvds.OrderBy(o => o.dateCommande).Reverse().ToList();
+                    break;
+                case "montant":
+                    sortedList = lesCommandesDvds.OrderBy(o => o.montant).Reverse().ToList();
+                    break;
+                case "nbExemplaire":
+                    sortedList = lesCommandesDvds.OrderBy(o => o.nbExemplaire).ToList();
+                    break;
+                case "etapeSuivi":
+                    sortedList = lesCommandesDvds.OrderBy(o => o.etapeSuivi).ToList();
+                    break;
+            }
+            RemplirDvdsListeCom(sortedList);
+        }
+
+
+        private void btnValiderCommandeDvds_Click(object sender, EventArgs e)
+        {
+            if (!txbNumCommandeDvds.Text.Equals("") && !txbNbExemplaireDvds.Text.Equals("") && !txbMontantDvds.Text.Equals(""))
+            {
+                try
+                {
+                    string id = txbNumCommandeDvds.Text;
+                    int nbExemplaire = int.Parse(txbNbExemplaireDvds.Text);
+                    double montant = double.Parse(txbMontantDvds.Text);
+                    DateTime dateCommande = dtpDateCommandeDvds.Value;
+                    string idLivreDvd = txbDvdsComNumRecherche.Text;
+                    string idSuivi = "01";
+                    Commande commande = new Commande(id, dateCommande, montant);
+
+                    if (controller.CreerCommande(commande))
+                    {
+                        controller.CreerCommandeDocument(id, nbExemplaire, idLivreDvd, idSuivi);
+                        lesCommandesDvds = controller.GetAllCommandes(txbDvdsComNumRecherche.Text);
+                        RemplirDvdsListeCom(lesCommandesDvds);
+                        MessageBox.Show("La commande " + id + " a bien été enregistrée pour le DVD : " + txbDvdsComTitre.Text, "Information");
+                        dgvDvdsComListe.Refresh();
+                    }
+                    else
+                    {
+                        MessageBox.Show("le numéro de commande existe déjà", "Erreur");
+                    }
+                }
+                catch
+                {
+                    MessageBox.Show("les informations saisies ne sont pas corrects", "Information");
+                    ViderInfosDvdsCom();
+                    txbNumCommande.Focus();
+                }
+            }
+            else
+            {
+                MessageBox.Show("tous les champs sont obligatoires", "Information");
+            }
+        }
+
+        private void TabDvdsCom_Enter(object sender, EventArgs e)
+        {
+            RemplirDvdsListeCom(null);
+        }
+
+
+        /// <summary>
+        /// Tri sur les colonnes
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+       
+        private void ViderInfosCommandesDvds()
+        {
+            txbNumCommandeDvds.Text = "";
+            txbNbExemplaireDvds.Text = "";
+            txbMontantDvds.Text = "";
+            dtpDateCommandeDvds.Value = DateTime.Now;
+        }
+
+        private void btnAjouterCommandeDvds_Click(object sender, EventArgs e)
+        {
+            ViderInfosCommandesDvds();
+            btnValiderCommandeDvds.Visible = true;
+            btnAnnulerCommandeDvds.Visible = true;
+            ViderInfosSuiviDvds();
+        }
+
+        private void btnSupprimerCommandeDvds_Click(object sender, EventArgs e)
+        {
+            CommandeDocument commande = (CommandeDocument)bdgDvdsComListe.List[bdgDvdsComListe.Position];
+            if ((commande.etapeSuivi == "en cours" || commande.etapeSuivi == "relancée")
+                && MessageBox.Show("Voulez-vous vraiment supprimer la commande numéro " + commande.id + " ?", "Confirmation de suppression", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                try
+                {
+                    controller.SupprimerCommande(commande.id);
+                    lesCommandesDvds = controller.GetAllCommandes(txbDvdsComNumRecherche.Text);
+                    RemplirDvdsListeCom(lesCommandesDvds);
+                    dgvDvdsComListe.Refresh();
+                }
+                catch
+                {
+                    MessageBox.Show("Erreur", "Erreur");
+                }
+            }
+            else
+            {
+                MessageBox.Show("Cette commande ne peut pas être supprimée", "Erreur");
+            }
+        }
+
+
+
+        private void btnAnnulerCommandeDvds_Click(object sender, EventArgs e)
+        {
+            ViderInfosCommandesDvds();
+            btnAnnulerCommandeDvds.Visible = false;
+            btnValiderCommandeDvds.Visible = false;
+        }
+
+        /*                  SUIVI COMMANDE              */
+
+        private void btnSuiviCommandeDvds_Click(object sender, EventArgs e)
+        {
+            groupBox3.Enabled = true;
+            CommandeDocument commande = (CommandeDocument)bdgDvdsComListe.List[bdgDvdsComListe.Position];
+            txbEtapeSuiviDvds.Text = commande.etapeSuivi;
+
+            cbxEtapeSuiviDvds.Items.Clear();
+            switch (commande.etapeSuivi)
+            {
+                case "en cours":
+                    cbxEtapeSuiviDvds.Text = "";
+                    cbxEtapeSuiviDvds.Items.Add("relancée");
+                    cbxEtapeSuiviDvds.Items.Add("livrée");
+                    break;
+                case "relancée":
+                    cbxEtapeSuiviDvds.Text = "";
+                    cbxEtapeSuiviDvds.Items.Add("en cours");
+                    cbxEtapeSuiviDvds.Items.Add("livrée");
+                    break;
+                case "livrée":
+                    cbxEtapeSuiviDvds.Text = "";
+                    cbxEtapeSuiviDvds.Items.Add("réglée");
+                    break;
+            }
+        }
+
+        private void ViderInfosSuiviDvds()
+        {
+            txbEtapeSuiviDvds.Text = "";
+            btnValiderSuiviDvds.Visible = false;
+            cbxEtapeSuiviDvds.Visible = false;
+            groupBox3.Enabled = false;
+        }
+
+        private void btnAnnulerSuiviDvds_Click(object sender, EventArgs e)
+        {
+            ViderInfosSuiviDvds();
+        }
+
+        private void btnModifierSuiviCommandeDvds_Click(object sender, EventArgs e)
+        {
+            cbxEtapeSuiviDvds.Visible = true;
+            btnValiderSuiviDvds.Visible = true;
+        }
+
+        private string ConvertitIdSuiviDvds(string etapeSuivi)
+        {
+            string idSuivi;
+            switch (etapeSuivi)
+            {
+                case "en cours":
+                    idSuivi = "01";
+                    break;
+                case "relancée":
+                    idSuivi = "02";
+                    break;
+                case "livrée":
+                    idSuivi = "03";
+                    break;
+                case "réglée":
+                    idSuivi = "04";
+                    break;
+                default:
+                    idSuivi = "";
+                    break;
+            }
+            return idSuivi;
+        }
+
+        private void btnValiderSuiviDvds_Click(object sender, EventArgs e)
+        {
+            if (!cbxEtapeSuiviDvds.Text.Equals(""))
+            {
+                try
+                {
+                    string idSuivi = ConvertitIdSuiviDvds(cbxEtapeSuiviDvds.Text);
+                    CommandeDocument commande = (CommandeDocument)bdgDvdsComListe.List[bdgDvdsComListe.Position];
+                    controller.ModifierSuiviCommandeDocument(commande.id, idSuivi);
+                    lesCommandesDvds = controller.GetAllCommandes(txbNumCommande.Text);
+                    RemplirDvdsListeCom(lesCommandesDvds);
+                    dgvDvdsComListe.Refresh();
+                    btnValiderCommandeDvds.Visible = false;
+                    btnAnnulerSuiviDvds.Visible = false;
+                    cbxEtapeSuiviDvds.Visible = false;
+                }
+                catch
+                {
+                    MessageBox.Show("Erreur", "Erreur");
+                }
+            }
+            else
+            {
+                MessageBox.Show("Veuillez saisir une nouvelle étape de suivi", "Erreur");
+            }
+        }
+
+
+
+
+
+
+
+
+
+        #endregion Onglet Commande de DVD
+
     }
-    #endregion Onglet Commande de Livres
 }
