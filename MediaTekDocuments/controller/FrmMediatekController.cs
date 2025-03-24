@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using MediaTekDocuments.model;
 using MediaTekDocuments.dal;
+using System;
 
 namespace MediaTekDocuments.controller
 {
@@ -68,6 +69,35 @@ namespace MediaTekDocuments.controller
         }
 
         /// <summary>
+        /// getter sur la liste des Abonnements Revues
+        /// </summary>
+        /// <returns>Liste d'objets Abonnement</returns>
+        public List<Abonnement> GetAllAbonnementsRevues(string idRevue)
+        {
+            return access.GetAllAbonnementsRevues(idRevue);
+        }
+
+        /// <summary>
+        /// getter sur la Création des Abonnements Revues
+        /// </summary>
+        /// <returns>Liste création Abonnement</returns>
+        public bool CreerAbonnement(string id, DateTime dateFinAbonnement, string idRevue)
+        {
+            return access.CreerAbonnement(id, dateFinAbonnement, idRevue);
+        }
+
+
+        /// <summary>
+        /// Supprime un abonnement dans la bdd
+        /// </summary>
+        /// <param name="id">Id de l'abonnement de document à supprimer</param>
+        /// <returns>True si la création a pu se faire</returns>
+        public bool SupprimerAbonnement(string id)
+        {
+            return access.SupprimerAbonnement(id);
+        }
+
+        /// <summary>
         /// getter sur les rayons
         /// </summary>
         /// <returns>Liste d'objets Rayon</returns>
@@ -104,6 +134,15 @@ namespace MediaTekDocuments.controller
         public bool CreerExemplaire(Exemplaire exemplaire)
         {
             return access.CreerExemplaire(exemplaire);
+        }
+
+        /// <summary>
+        /// getter sur les rappels
+        /// </summary>
+        /// <returns>Liste d'objets Abonnement</returns>
+        public List<Abonnement> GetAllRappelRevue()
+        {
+            return access.GetAllRappelRevue();
         }
 
         /// <summary>

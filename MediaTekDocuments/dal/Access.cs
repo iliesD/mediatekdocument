@@ -252,6 +252,68 @@ namespace MediaTekDocuments.dal
         }
 
         /// <summary>
+        /// Retourne toutes les abonnements d'une revue à partir de la BDD
+        /// </summary>
+        /// <returns>Liste d'objets Abonnement</returns>
+        public List<Abonnement> GetAllAbonnementsRevues(string idRevue)
+        {
+            String jsonId = "{ \"id\" : \"" + idRevue + "\"}";
+            List<Abonnement> lesAbonnementsRevues = TraitementRecup<Abonnement>(GET, "abonnement/" + jsonId, null);
+            return lesAbonnementsRevues;
+        }
+
+
+        /// <summary>
+        /// écriture d'un abonnement en base de données
+        /// </summary>
+        /// <param name=</param>
+        /// <returns>true si l'insertion a pu se faire (retour != null)</returns>
+        public bool CreerAbonnement(string id, DateTime dateFinAbonnement, string idRevue)
+        {
+            string dateFormatted = dateFinAbonnement.ToString("yyyy-MM-dd");
+            String jsonAbonnement = "{ \"id\" : \"" + id + "\", \"dateFinAbonnement\" : \"" + dateFormatted + "\", \"idRevue\" : \"" + idRevue + "\"}";
+            try
+            {
+                List<Abonnement> liste = TraitementRecup<Abonnement>(POST, "abonnement", "champs=" + jsonAbonnement);
+                return (liste != null);
+            }
+            catch 
+            {
+                Console.WriteLine("ERREUR DANS LA REQUETE POST POUR L'ABONNEMENT");
+            }
+            return false;
+        }
+        /// <summary>
+        /// Supression d'un abonnement de document en base de données
+        /// </summary>
+        /// <param name="id">Id de l'abonnement de document à supprimer</param>
+        /// <returns>True si la modification a pu se faire</returns>
+        public bool SupprimerAbonnement(string id)
+        {
+            String jsonId = "{ \"id\" : \"" + id + "\"}";
+            try
+            {
+                List<Commande> liste = TraitementRecup<Commande>(DELETE, "commande/" + jsonId, null);
+                return (liste != null);
+            }
+            catch
+            {
+                Console.WriteLine("Erreur dans la requête delete pour l'abonnement");
+            }
+            return false;
+        }
+
+        /// <summary>
+        ///récupère tous les abonnemnts qui expirent dans moins de 30 jours
+        /// </summary>
+        /// <returns>Liste d'objets abonnement</returns>
+        public List<Abonnement> GetAllRappelRevue()
+        {
+            List<Abonnement> lesRappels = TraitementRecup<Abonnement>(GET, "rappel", null);
+            return lesRappels;
+        }
+
+        /// <summary>
         /// Traitement de la récupération du retour de l'api, avec conversion du json en liste pour les select (GET)
         /// </summary>
         /// <typeparam name="T"></typeparam>
