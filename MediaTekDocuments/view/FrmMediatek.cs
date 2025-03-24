@@ -2122,8 +2122,6 @@ namespace MediaTekDocuments.view
             btnValiderAboRevues.Visible = true;
         }
 
-        #endregion Onglet Commande de Revue
-
         private void btnSupprimerAboRevues_Click(object sender, EventArgs e)
         {
             Abonnement abonnement = (Abonnement)bdgRevuesComListe.List[bdgRevuesComListe.Position];
@@ -2151,6 +2149,7 @@ namespace MediaTekDocuments.view
                 MessageBox.Show("Cet abonnement ne peut pas être supprimé car il contient des exemplaires", "Erreur");
             }
         }
+
         private bool ParutionDansAbonnement(DateTime dateCommande, DateTime dateFinAbonnement, DateTime dateParution)
         {
             return dateParution >= dateCommande && dateParution <= dateFinAbonnement;
@@ -2167,7 +2166,23 @@ namespace MediaTekDocuments.view
             }
             return true;
         }
+        #endregion Onglet Commande de Revue
 
+        #region Fenetre Authentification
+
+        /// <summary>
+        /// Empêche l'accès aux onglets en fonction de l'utilisateur
+        /// </summary>
+        public void EmpecherAcces()
+        {
+            tabOngletsApplication.TabPages.Remove(tabPage1);
+            tabOngletsApplication.TabPages.Remove(tabPage2);
+            tabOngletsApplication.TabPages.Remove(tabPage3);
+            tabOngletsApplication.TabPages.Remove(tabReceptionRevue);
+            tabOngletsApplication.Enter -= tabOngletsApplication_Enter;
+        }
+
+        #endregion Fenêtre Authentifiation
     }
 
 }

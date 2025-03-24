@@ -146,6 +146,23 @@ namespace MediaTekDocuments.controller
         }
 
         /// <summary>
+        /// getter sur les utilisateurs
+        /// </summary>
+        /// <returns>Liste d'objets Utilisateur</returns>
+        public string GetAllUtilisateur(string login, string password)
+        {
+            List<Utilisateur> Utilisateur = access.GetAllUtilisateur(login);
+            foreach (var user in Utilisateur)
+            {
+                if (user.password == password)
+                {
+                    return user.idService;
+                }
+            }
+            return "";
+        }
+
+        /// <summary>
         /// Créer une commande d'un livre dans la BDD
         /// </summary>
         /// <param name="commande">L'objet Commande concerné</param>
